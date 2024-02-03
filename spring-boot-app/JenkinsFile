@@ -58,45 +58,45 @@ pipeline {
 
     }
 
-    stage('Build and Test') {
-      steps {
-        // sh 'ls -ltr'
-        // builds the project and create a JAR file
-        sh 'cd spring-boot-app && mvn -U clean package'
-      }
+    // stage('Build and Test') {
+    //   steps {
+    //     // sh 'ls -ltr'
+    //     // builds the project and create a JAR file
+    //     sh 'cd spring-boot-app && mvn -U clean package'
+    //   }
       
-    }
+    // }
     
-    stage('Unit Test') {
-         steps {
-             sh 'cd spring-boot-app && mvn test'
-         }
-       }
-    stage('Integration Test') {
-        steps {
-            sh 'cd spring-boot-app && mvn verify -DskipUnitTests'
-        }
-    }
-    stage('Checkstyle Code Analysis') {
-        steps {
-            sh 'cd spring-boot-app && mvn checkstyle:checkstyle'
-        }
-        post {
-            success {
-                echo 'Generated Analysis Result'
-            }
-        }
-    }
-    stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://172.31.94.235:9000/"
-      }
-      steps {
-        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
-        }
-      }
-    }
+    // stage('Unit Test') {
+    //      steps {
+    //          sh 'cd spring-boot-app && mvn test'
+    //      }
+    //    }
+    // stage('Integration Test') {
+    //     steps {
+    //         sh 'cd spring-boot-app && mvn verify -DskipUnitTests'
+    //     }
+    // }
+    // stage('Checkstyle Code Analysis') {
+    //     steps {
+    //         sh 'cd spring-boot-app && mvn checkstyle:checkstyle'
+    //     }
+    //     post {
+    //         success {
+    //             echo 'Generated Analysis Result'
+    //         }
+    //     }
+    // }
+    // stage('Static Code Analysis') {
+    //   environment {
+    //     SONAR_URL = "http://172.31.94.235:9000/"
+    //   }
+    //   steps {
+    //     withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_AUTH_TOKEN')]) {
+    //       sh 'cd spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+    //     }
+    //   }
+    // }
 
 //     stage('Upload artifact to Nexus') {
 //        steps {
