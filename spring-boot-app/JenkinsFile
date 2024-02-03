@@ -98,60 +98,60 @@ pipeline {
       }
     }
 
-    stage('Upload artifact to Nexus') {
-       steps {
-           withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER_NAME')]) {
-           sh "sed -i \"s/.*<username><\\/username>/<username>$USER_NAME<\\/username>/g\" ${WORKSPACE}/nexus-setup/settings.xml"
-           sh "sed -i \"s/.*<password><\\/password>/<password>$PASSWORD<\\/password>/g\" ${WORKSPACE}/nexus-setup/settings.xml"
-           sh 'sudo cp ${WORKSPACE}/nexus-setup/settings.xml /var/lib/jenkins/.m2'
-           sh 'cd spring-boot-app && mvn clean deploy -DskipTests'
-           }
-          
-       }
-     }
-
-
-    stage('Build and Push Docker Image') {
-      environment {
-        awsAccountId = '774252238032'
-        region = 'us-east-1'
-        repositoryName = 'jjtech-demo'
-        dockerImageTag = "${BUILD_NUMBER}"
-        ecrRegistry = "${awsAccountId}.dkr.ecr.${region}.amazonaws.com"
-      }
-      steps {
-        script {
-            // Build the Docker image
-            sh "cd spring-boot-app && docker build -t ${repositoryName}:${dockerImageTag} ."
-
-            // Authenticate and push the Docker image to ECR
-                sh "aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${ecrRegistry}"
-                sh "docker tag ${repositoryName}:${dockerImageTag} ${ecrRegistry}/${repositoryName}:${dockerImageTag}"
-                sh "docker push ${ecrRegistry}/${repositoryName}:${dockerImageTag}"
-                sh "docker rmi ${ecrRegistry}/${repositoryName}:${dockerImageTag}"
-                sh " docker rmi ${repositoryName}:${dockerImageTag}"
-      }
-    }
-
-    } 
-    
-    stage('Install kubectl') {
-            steps {
-                sh '''
-                    # Specify the kubectl version
-                    KUBECTL_VERSION="v1.24.0"
-
-                    # Download kubectl binary
-                    curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-
-                    # Make the kubectl binary executable
-                    sudo chmod +x kubectl
-
-                    # Move kubectl binary to a directory in the PATH
-                    sudo mv kubectl /usr/local/bin/
-                '''
-            }
-        }
+//     stage('Upload artifact to Nexus') {
+//        steps {
+//            withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER_NAME')]) {
+//            sh "sed -i \"s/.*<username><\\/username>/<username>$USER_NAME<\\/username>/g\" ${WORKSPACE}/nexus-setup/settings.xml"
+//            sh "sed -i \"s/.*<password><\\/password>/<password>$PASSWORD<\\/password>/g\" ${WORKSPACE}/nexus-setup/settings.xml"
+//            sh 'sudo cp ${WORKSPACE}/nexus-setup/settings.xml /var/lib/jenkins/.m2'
+//            sh 'cd spring-boot-app && mvn clean deploy -DskipTests'
+//            }
+//
+//        }
+//      }
+//
+//
+//     stage('Build and Push Docker Image') {
+//       environment {
+//         awsAccountId = '774252238032'
+//         region = 'us-east-1'
+//         repositoryName = 'jjtech-demo'
+//         dockerImageTag = "${BUILD_NUMBER}"
+//         ecrRegistry = "${awsAccountId}.dkr.ecr.${region}.amazonaws.com"
+//       }
+//       steps {
+//         script {
+//             // Build the Docker image
+//             sh "cd spring-boot-app && docker build -t ${repositoryName}:${dockerImageTag} ."
+//
+//             // Authenticate and push the Docker image to ECR
+//                 sh "aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${ecrRegistry}"
+//                 sh "docker tag ${repositoryName}:${dockerImageTag} ${ecrRegistry}/${repositoryName}:${dockerImageTag}"
+//                 sh "docker push ${ecrRegistry}/${repositoryName}:${dockerImageTag}"
+//                 sh "docker rmi ${ecrRegistry}/${repositoryName}:${dockerImageTag}"
+//                 sh " docker rmi ${repositoryName}:${dockerImageTag}"
+//       }
+//     }
+//
+//     }
+//
+//     stage('Install kubectl') {
+//             steps {
+//                 sh '''
+//                     # Specify the kubectl version
+//                     KUBECTL_VERSION="v1.24.0"
+//
+//                     # Download kubectl binary
+//                     curl -LO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+//
+//                     # Make the kubectl binary executable
+//                     sudo chmod +x kubectl
+//
+//                     # Move kubectl binary to a directory in the PATH
+//                     sudo mv kubectl /usr/local/bin/
+//                 '''
+//             }
+//         }
         
 
     stage("Deploy to EKS"){
